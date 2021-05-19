@@ -1,0 +1,35 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(519,5): warning MSB8028: Katalog pośredni (Debug\) zawiera pliki udostępnione z innego projektu (Zadanie1.vcxproj). Może to spowodować niepoprawne zachowanie podczas oczyszczania i ponownej kompilacji.
+  main.cpp
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(111,17): warning C4305: "inicjowanie": obcięcie z "double" do "float"
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(208,22): warning C4018: ">=": niezgodność typu ze znakiem/bez znaku
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(218,22): warning C4018: ">=": niezgodność typu ze znakiem/bez znaku
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(264,35): warning C4244: "=": konwersja z "double" do "T", możliwa utrata danych
+          with
+          [
+              T=float
+          ]
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(265,15): warning C4244: "=": konwersja z "double" do "T", możliwa utrata danych
+          with
+          [
+              T=float
+          ]
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(266,35): warning C4244: "=": konwersja z "double" do "T", możliwa utrata danych
+          with
+          [
+              T=float
+          ]
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(283,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(284,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(291,16): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(293,18): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(294,17): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(495,14): warning C4244: "inicjowanie": konwersja z "sf::Int64" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(555,17): warning C4305: "+=": obcięcie z "double" do "float"
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(558,17): warning C4305: "-=": obcięcie z "double" do "float"
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(564,48): warning C4244: "argument": konwersja z "sf::Int64" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(569,49): warning C4244: "argument": konwersja z "sf::Int64" do "float", możliwa utrata danych
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(596,79): warning C4305: "argument": obcięcie z "double" do "float"
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(600,78): warning C4305: "argument": obcięcie z "double" do "float"
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(607,78): warning C4305: "argument": obcięcie z "double" do "float"
+C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\glm\glm\detail\type_quat.inl(614,76): warning C4305: "argument": obcięcie z "double" do "float"
+  Zadanie1.vcxproj -> C:\Users\jagie\Desktop\Studia\Grafika komputerowa\Zadanie4\Debug\3D_Cube.exe
