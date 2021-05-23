@@ -11,8 +11,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -67,6 +67,170 @@ int lastX, lastY;
 double yaw = -90; //rotation on X axis
 double pitch = 0; //rotation on Y axis
 
+bool LoadModelOBJNormalsCoord(int& points_, int points_for_mono_[], const char* filename, int buffer)
+{
+	int vert_num = 0;
+	int triangles = 0;
+	int normals = 0;
+	int coord_num = 0;
+
+	std::ifstream myReadFile;
+	myReadFile.open(filename);
+	std::string output;
+	if (myReadFile.is_open()) {
+		while (!myReadFile.eof()) {
+			myReadFile >> output;
+			if (output == "v") vert_num++;
+			if (output == "f") triangles++;
+			if (output == "vn") normals++;
+			if (output == "vt") coord_num++;
+		}
+	}
+
+	myReadFile.close();
+	myReadFile.open(filename);
+
+
+	float** vert;
+	vert = new float* [vert_num]; //przydzielenie pamięci na w wierszy
+
+	for (int i = 0; i < vert_num; i++)
+		vert[i] = new float[3];
+
+
+	int** trian;
+	trian = new int* [triangles]; //przydzielenie pamięci na w wierszy
+
+	for (int i = 0; i < triangles; i++)
+		trian[i] = new int[9];
+
+	float** norm;
+	norm = new float* [normals]; //przydzielenie pamięci na w wierszy
+
+	for (int i = 0; i < normals; i++)
+		norm[i] = new float[3];
+
+	float** coord;
+	coord = new float* [coord_num]; //przydzielenie pamięci na w wierszy
+
+	for (int i = 0; i < coord_num; i++)
+		coord[i] = new float[2];
+
+	int licz_vert = 0;
+	int licz_triang = 0;
+	int licz_normals = 0;
+	int licz_coord = 0;
+
+	int obj_number = 0; //numer aktualnego obiektu
+	int f_lines_per_object[5]; //zmienna pomocnicza do liczenia ilosci linijek f dla kazdego obiektu osobno
+
+	f_lines_per_object[0] = 0;
+
+	while (!myReadFile.eof()) {
+		output = "";
+		myReadFile >> output;
+		if (output == "vn") { myReadFile >> norm[licz_normals][0]; myReadFile >> norm[licz_normals][1]; myReadFile >> norm[licz_normals][2]; licz_normals++; }
+		if (output == "v") { myReadFile >> vert[licz_vert][0]; myReadFile >> vert[licz_vert][1]; myReadFile >> vert[licz_vert][2]; licz_vert++; }
+		if (output == "vt") { myReadFile >> coord[licz_coord][0]; myReadFile >> coord[licz_coord][1]; licz_coord++; }
+
+		if (output == "f") {
+
+			for (int i = 0; i < 9; i += 3)
+			{
+				std::string s;
+				myReadFile >> s;
+				std::stringstream ss(s);
+
+				std::vector <std::string> el;
+				std::string item;
+
+
+				while (getline(ss, item, '/')) {
+					el.push_back(item);
+				}
+				trian[licz_triang][i] = std::stoi(el[0]);
+				trian[licz_triang][i + 1] = std::stoi(el[1]);
+				trian[licz_triang][i + 2] = std::stoi(el[2]);
+
+
+			}
+			licz_triang++;
+		}
+
+		if (output == "o") obj_number++;
+
+		if (obj_number > 0) {
+			f_lines_per_object[obj_number] = licz_triang - f_lines_per_object[obj_number - 1] - 1; //obliczamy ile linijek f przypada na jeden obiekt
+			points_for_mono_[obj_number] = f_lines_per_object[obj_number] * 3; //wlasciwa ilosc trojkatow
+		}
+
+	}
+
+
+	GLfloat* vertices = new GLfloat[triangles * 24];
+
+	int vert_current = 0;
+
+	for (int i = 0; i < triangles; i++)
+	{
+		vertices[vert_current] = vert[trian[i][0] - 1][0];
+		vertices[vert_current + 1] = vert[trian[i][0] - 1][1];
+		vertices[vert_current + 2] = vert[trian[i][0] - 1][2];
+		vertices[vert_current + 3] = norm[trian[i][2] - 1][0];
+		vertices[vert_current + 4] = norm[trian[i][2] - 1][1];
+		vertices[vert_current + 5] = norm[trian[i][2] - 1][2];
+		vertices[vert_current + 6] = coord[trian[i][1] - 1][0];
+		vertices[vert_current + 7] = coord[trian[i][1] - 1][1];
+
+		vertices[vert_current + 8] = vert[trian[i][3] - 1][0];
+		vertices[vert_current + 9] = vert[trian[i][3] - 1][1];
+		vertices[vert_current + 10] = vert[trian[i][3] - 1][2];
+		vertices[vert_current + 11] = norm[trian[i][5] - 1][0];
+		vertices[vert_current + 12] = norm[trian[i][5] - 1][1];
+		vertices[vert_current + 13] = norm[trian[i][5] - 1][2];
+		vertices[vert_current + 14] = coord[trian[i][4] - 1][0];
+		vertices[vert_current + 15] = coord[trian[i][4] - 1][1];
+
+		vertices[vert_current + 16] = vert[trian[i][6] - 1][0];
+		vertices[vert_current + 17] = vert[trian[i][6] - 1][1];
+		vertices[vert_current + 18] = vert[trian[i][6] - 1][2];
+		vertices[vert_current + 19] = norm[trian[i][8] - 1][0];
+		vertices[vert_current + 20] = norm[trian[i][8] - 1][1];
+		vertices[vert_current + 21] = norm[trian[i][8] - 1][2];
+		vertices[vert_current + 22] = coord[trian[i][7] - 1][0];
+		vertices[vert_current + 23] = coord[trian[i][7] - 1][1];
+
+		vert_current += 24;
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * triangles * 24, vertices, GL_STATIC_DRAW);
+
+	points_ = triangles * 3;
+
+	delete vertices;
+
+
+
+
+	for (int i = 0; i < vert_num; i++)
+		delete[] vert[i];
+	delete[] vert;
+
+	for (int i = 0; i < triangles; i++)
+		delete[] trian[i];
+	delete[] trian;
+
+	for (int i = 0; i < normals; i++)
+		delete[] norm[i];
+	delete[] norm;
+
+	for (int i = 0; i < coord_num; i++)
+		delete[] coord[i];
+	delete[] coord;
+
+	return 0;
+}
 
 void generateCube(int buffer) {
 	int vertex = 36;
@@ -302,6 +466,15 @@ int main() {
 
 	generateCube(vbo);
 
+	int points = 0;
+	int points_for_mono[5];
+	points_for_mono[0] = 0;
+
+	LoadModelOBJNormalsCoord(points, points_for_mono, "objects.obj", vbo);
+
+	for (int i = 0; i < 5; i++) {
+		cout << "Obiekt nr. triangels number" << i+1 << " : " << points_for_mono[i] << endl;
+	}
 	// Creation and compilation of a vertex shader
 	// Utworzenie i skompilowanie shadera wierzchołków
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -336,9 +509,9 @@ int main() {
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
 
-	GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-	glEnableVertexAttribArray(colAttrib);
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	//GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
+	//glEnableVertexAttribArray(colAttrib);
+	//glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 
 	GLint TexCoord = glGetAttribLocation(shaderProgram, "aTexCoord");
 	glEnableVertexAttribArray(TexCoord);
@@ -388,7 +561,7 @@ int main() {
 	// Load image, create texture and generate mipmaps	
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); //tell stb_image.h to flip loaded textrue's on the y-axis
-	unsigned char* data = stbi_load("wood.bmp", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("table.bmp", &width, &height, &nrChannels, 0);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -412,6 +585,52 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	stbi_set_flip_vertically_on_load(true);
+	data = stbi_load("metal.bmp", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+
+	unsigned int texture2;
+
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	stbi_set_flip_vertically_on_load(true);
+	data = stbi_load("obraz.bmp", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+
+	unsigned int texture3;
+
+	glGenTextures(1, &texture3);
+	glBindTexture(GL_TEXTURE_2D, texture3);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	stbi_set_flip_vertically_on_load(true);
 	data = stbi_load("crate.bmp", &width, &height, &nrChannels, 0);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -424,6 +643,9 @@ int main() {
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 1);
+	glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 2);
+	glUniform1i(glGetUniformLocation(shaderProgram, "texture3"), 3);
+
 
 
 	// Running of the main look / Rozpoczęcie pętli zdarzeń
@@ -538,18 +760,30 @@ int main() {
 		switch (mode) {
 
 		case 0: //Mono
+			glActiveTexture(GL_TEXTURE0);
 			glViewport(0, 0, window.getSize().x, window.getSize().y);
-			glDrawArrays(primitive, 0, 36);
+
+			glBindTexture(GL_TEXTURE_2D, texture0);
+			glDrawArrays(primitive, points_for_mono[0], points_for_mono[1]);
+
+			glBindTexture(GL_TEXTURE_2D, texture1);
+			glDrawArrays(primitive, points_for_mono[1], points_for_mono[2]);
+
+			glBindTexture(GL_TEXTURE_2D, texture2);
+			glDrawArrays(primitive, (points_for_mono[1] + points_for_mono[2]), points_for_mono[3]);
+
+			glBindTexture(GL_TEXTURE_2D, texture3);
+			glDrawArrays(primitive, (points_for_mono[1] + points_for_mono[2] + points_for_mono[3]), points_for_mono[4]);
 			break;
 			
 		case 1: //Site by site
 			glViewport(0, 0, window.getSize().x/2, window.getSize().y);
 			StereoProjection(shaderProgram, -6, 6, -4.8, 4.8, 12.99, -100, 0, 13, -0.05);
-			glDrawArrays(primitive, 0, 36);
+			glDrawArrays(primitive, 0, points);
 
 			glViewport(window.getSize().x/2, 0, window.getSize().x/2, window.getSize().y);
 			StereoProjection(shaderProgram, -6, 6, -4.8, 4.8, 12.99, -100, 0, 13, 0.05);
-			glDrawArrays(primitive, 0, 36);
+			glDrawArrays(primitive, 0, points);
 			break;
 
 		case 2: //Anaglyph mode  
@@ -557,14 +791,14 @@ int main() {
 			glDrawBuffer(GL_BACK_LEFT);
 			StereoProjection(shaderProgram, -6, 6, -4.8, 4.8, 12.99, -100, 0, 13, -sep);
 			glColorMask(true, false, false, false);
-			glDrawArrays(primitive, 0, 36);
+			glDrawArrays(primitive, 0, points);
 
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			glDrawBuffer(GL_BACK_RIGHT);
 			StereoProjection(shaderProgram,-6, 6, -4.8, 4.8, 12.99, -100, 0, 13, sep);
 			glColorMask(false, false, true, false);
-			glDrawArrays(primitive, 0, 36);
+			glDrawArrays(primitive, 0, points);
 			glColorMask(true, true, true, true);
 			break;
 		}
